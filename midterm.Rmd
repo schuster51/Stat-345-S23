@@ -4,12 +4,12 @@ font: 12pt
 date: "March 31"
 author: "Sam Schuster"
 output:
-  html_document: default
-  pdf_document: default
   word_document: default
+  pdf_document: default
+  html_document: default
 ---
     
-```{R echo = FALSE, warning = FALSE}
+```{R echo = FALSE, warning = FALSE, fig.width = 10, fig.height=10}
 library(ggplot2)
 library(nbastatR)
 library(tidyverse)
@@ -30,8 +30,7 @@ GSW2021 <- teams_shots(teams = "Golden State Warriors", seasons = 2021)
 
 GSW <- bind_rows(GSW2010,GSW2011,GSW2012,GSW2013,GSW2014,GSW2015,GSW2016,GSW2017,GSW2018,GSW2019,GSW2020,GSW2021)
 
-factor(GSW$isShotMade) #To make shot color a continuous variable
-My_shotchart <- ggplot(GSW, aes(x=(locationX/10)+25, y = (locationY/10)+4.6))+ #To fix the coordinate X for a basketball court, it was nescessary to add 25 so that it would be in a 0 to 50 ft court. The Y-coordinate took the basketball rim as the (0,0) coordinate, so to correct this I found the minimum Y-value and divided it by 10 and plused it to the location Y to make it fit into my court. 
+ggplot(GSW, aes(x=(locationX/10)+25, y = (locationY/10)+4.6))+ #To fix the coordinate X for a basketball court, it was nescessary to add 25 so that it would be in a 0 to 50 ft court. The Y-coordinate took the basketball rim as the (0,0) coordinate, so to correct this I found the minimum Y-value and divided it by 10 and plused it to the location Y to make it fit into my court. 
    
 ##The following code is used to produce the image of a basketball court on my plots
    #NBA Court Boundaries
@@ -70,7 +69,6 @@ My_shotchart <- ggplot(GSW, aes(x=(locationX/10)+25, y = (locationY/10)+4.6))+ #
    xlab("Width Location of Shot")+
    facet_wrap(~yearSeason,nrow = 2)
 
-My_shotchart
 ```
 
 
@@ -96,16 +94,8 @@ Deeper Into the Report of Findings
    
    -The location of shots being took may have changed the most between 2020 and 2021 due to the effect that covid-19 had on the entire NBA. Since this season occurred in what is referred to as "The Bubble", players were able to perform better due to lack of crowd and lack of distractions. This year also acted as an experimental year for most as well, so players were taking more 3-point attempts. It is also worth noting that a lot of the three-point attempts were missed in 2020, and this could be due to Stephen Curry missing the majority of that season.
 
-4. (10 points) Above and Beyond. Explore the data a bit, and create a graphic that uses (or incorporates) different information than what was used above. Some notes:
 
-   - Create an additional graphic that incorporates at least one additional variable not previously used. The additional data should be drawn from a different dataset (function call) than the original graphic used. These two (or more) datasets may need to be joined appropriately.
-   - You can either add more information to the plot above, or create a different plot. 
-   - Formatting, labelling, etc. are all important here too.
-   - Adding marginal densities or other "bells and whistles" might offer additional insight.
-   - This graphic should be included at the end of the report (after the more detailed explanations). 
-   - You should include a brief description of the graphic (highlighting the different/additional information used).
-
-```{R echo = FALSE, warning = FALSE}
+```{R echo = FALSE, warning = FALSE, fig.width = 8,fig.height=5}
 #The following code is to obtain annual season stats for the Golden State Warriors from the years 2000-2020
 stats <- teams_annual_stats(teams = "Golden State Warriors", all_active_teams = FALSE)%>%
    filter(nameTeam =="Golden State Warriors",slugSeason >= 2000, slugSeason <= 2021)
