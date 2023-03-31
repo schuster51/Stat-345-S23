@@ -1,94 +1,101 @@
 ---
-title: "STAT 345 Midterm Project"
+title: "Golden State Warriors Report"
 font: 12pt
-date: "Due March 31"
+date: "March 31"
+author: "Sam Schuster"
 output:
+  html_document: default
   pdf_document: default
   word_document: default
-  html_document: default
 ---
-
-> "Our offense is like the Pythagorean Theorem. There is no answer!", _Shaquille O'Neal_
-
-
-## The Background
-
-Your role for the midterm project is that of data analyst intern at an NBA (professional basketball) team. Your direct supervisor (also part of the analytics team) has asked you to create a data visualization to illustrate how (or if) the team's shots have changed over time. After some initial clarifying questions, your supervisor confessed that they had seen some pretty cool shot charts at http://savvastjortjoglou.com/nba-shot-sharts.html and would like to extend the ideas a bit. 
-
-Your data for the midterm project may come from a variety of sources, including the NBA directly, as well as Basketball-Reference, HoopsHype, and others. There are several ways to access the data, but perhaps the simplest is through the `nbastatR` package, which serves as a wrapper (or set of helper functions) for these various data sources. There is a lot of potentially useful information that can be found using this package; unfortunately, the documentation is somewhat inconsistent. For example, the documentation at https://www.rdocumentation.org/packages/nbastatR/versions/0.1.110202031 is pretty well-formatted and easy to navigate, but the current function names have changed a bit (see `?nbastatR` and click "Index"). (If you use the nbastatR package, you'll want to install the package using the following code. There are other packages with this type of data, though.)
-
-```
-library(devtools)
-devtools::install_github("abresler/nbastatR")
-```
-
-## The Tasks
-
-1. (30 points) Produce a graphic displaying the shot locations for a particular team over several years. Some notes:
-
-   - Colors should be chosen to reflect the team, if possible.
-   - There are likely many overlaid points -- handle this by either binning these by location, or use opacity.
-   - Incorporate information about whether the shot was made or not (shape, color, etc.).
-   - The graphic should be well-labeled, titled, etc.
-   - Start with a graph for a single year, then extend to several years. Up to 20 years of shot data is available. Either facet these by year or animate using the years.
-   - You'll want to figure out what the coordinates mean somehow. This might be through the documentation, but could also be determined using aspects of the data itself and the dimensions of an NBA court.
-    - If possible, try to put a basketball court on the background of the image (you'll need to scale it appropriately).
     
-```{R}
+```{R echo = FALSE, warning = FALSE}
 library(ggplot2)
 library(nbastatR)
 library(tidyverse)
 library(dplyr)
 
-GSW <- teams_shots(teams = "Golden State Warriors", seasons =2010)
+GSW2010 <- teams_shots(teams = "Golden State Warriors", seasons = 2010)
+GSW2011 <- teams_shots(teams = "Golden State Warriors",seasons = 2011)
+GSW2012 <- teams_shots(teams = "Golden State Warriors",seasons = 2012)
+GSW2013 <- teams_shots(teams = "Golden State Warriors",seasons = 2013)
+GSW2014 <- teams_shots(teams = "Golden State Warriors",seasons = 2014)
+GSW2015 <- teams_shots(teams = "Golden State Warriors",seasons = 2015)
+GSW2016 <- teams_shots(teams = "Golden State Warriors",seasons = 2016)
+GSW2017 <- teams_shots(teams = "Golden State Warriors",seasons = 2017)
+GSW2018 <- teams_shots(teams = "Golden State Warriors",seasons = 2018)
+GSW2019 <- teams_shots(teams = "Golden State Warriors",seasons = 2019)
+GSW2020 <- teams_shots(teams = "Golden State Warriors",seasons = 2020)
+GSW2021 <- teams_shots(teams = "Golden State Warriors", seasons = 2021)
 
-ggplot(GSW, aes(x=locationX/10, y = locationY/10))+
-   geom_segment(aes(x = 0, y = 0, xend = 0, yend = 47)) +
-    geom_segment(aes(x = 50, y =47, xend = 50, yend = 0)) +  
-    geom_segment(aes(x = 0, y = 47, xend = 50, yend = 47)) + 
-    geom_segment(aes(x = 0, y = 0, xend = 50, yend = 0), color = 'black') +
+GSW <- bind_rows(GSW2010,GSW2011,GSW2012,GSW2013,GSW2014,GSW2015,GSW2016,GSW2017,GSW2018,GSW2019,GSW2020,GSW2021)
+
+factor(GSW$isShotMade) #To make shot color a continuous variable
+My_shotchart <- ggplot(GSW, aes(x=(locationX/10)+25, y = (locationY/10)+4.6))+ #To fix the coordinate X for a basketball court, it was nescessary to add 25 so that it would be in a 0 to 50 ft court. The Y-coordinate took the basketball rim as the (0,0) coordinate, so to correct this I found the minimum Y-value and divided it by 10 and plused it to the location Y to make it fit into my court. 
+   
+##The following code is used to produce the image of a basketball court on my plots
+   #NBA Court Boundaries
+    geom_segment(aes(x = 0, y = 0, xend = 0, yend = 47)) +   #Left
+    geom_segment(aes(x = 50, y =47, xend = 50, yend = 0)) +  #Right
+    geom_segment(aes(x = 0, y = 47, xend = 50, yend = 47)) + #Top/Half-court line
+    geom_segment(aes(x = 0, y = 0, xend = 50, yend = 0), color = 'black') +   #Bottom
+    #Free-throw
+        #Line
     geom_segment(aes(x = 19, y = 19, xend = 31, yend = 19)) +
+        #Top circle
     geom_curve(aes(x = 19, y = 19, xend = 31, yend = 19), curvature = -1,
                lineend = 'round', color = 'black') +
+        #Bottom circle  
     geom_curve(aes(x = 19, y = 19, xend = 31, yend = 19), curvature = 1,
                linetype = 2, lineend = 'round') +
-    geom_segment(aes(x = 17, y = 19, xend = 33, yend = 19)) + 
-    geom_segment(aes(x = 17, y = 0, xend = 17, yend = 19)) +  
-    geom_segment(aes(x = 33, y = 0, xend = 33, yend = 19)) + 
-    geom_segment(aes(x = 3, y = 0, xend = 3, yend = 14)) +   
-    geom_segment(aes(x = 47, y = 0, xend = 47, yend = 14)) + 
+    #Key
+    geom_segment(aes(x = 17, y = 19, xend = 33, yend = 19)) + #Top
+    geom_segment(aes(x = 17, y = 0, xend = 17, yend = 19)) +  #Left
+    geom_segment(aes(x = 33, y = 0, xend = 33, yend = 19)) +  #Right
+    #3-point Line
+    geom_segment(aes(x = 3, y = 0, xend = 3, yend = 14)) +   #Left
+    geom_segment(aes(x = 47, y = 0, xend = 47, yend = 14)) + #Right
     geom_curve(aes(x = 3, y = 14, xend = 47, yend = 14), curvature = -.75,
-               angle = 90) +
+               angle = 90) + #Curve
+    #Backboard
     geom_segment(aes(x = 22, y = 4, xend = 28, yend = 4)) +
-    coord_fixed()
-   #geom_point(aes(col=isShotMade), size = .5)+
-   #scale_color_manual(values = c("Gold","Blue"),name = "Shot Outcome",labels = c("Miss","Make"))+
-   #ggtitle("Golden State Warriors Shotchart 2010-2020")+
-   #ylab("Location Y")+
-   #xlab("Location X")
-```
+    #Themes
+    coord_fixed()+
    
-2. (30 points) Summarize the graphic/series of graphics into a digestible, bullet-point brief report for front-office staff. Some notes:
+   ##The following code is used to plot the shots on my graph
+   geom_point(aes(col=isShotMade), size = .25, alpha = .5)+
+   scale_color_manual(values = c("Gold","Blue"),name = "Shot Outcome",labels = c("Miss","Make"))+
+   ggtitle("Golden State Warriors Shotchart 2010-2021")+
+   ylab("Length Location of Shot")+
+   xlab("Width Location of Shot")+
+   facet_wrap(~yearSeason,nrow = 2)
 
-   - The main body of the report should be very brief -- just the graphic(s) and the bullet-pointed list of findings, which should be short and clear.
-   - Include a more detailed explanation of these bullet points, for further reading by those interested. This section should follow the bullet-point section, but should be organized similarly for reference. 
-   - Your report to the front-office shouldn't include any code.
-   - This report should be generated using RMarkdown. However, the choice of output type (Word, PDF, or HTML) is up to you (you could even make slides if you want to). 
+My_shotchart
+```
+
+
+Report of Findings
+   -In general more shots are missed than made.
    
-```{R}
-library(ggplot2)
+   -Shots taken near the 3-point line tend to result in more misses than makes.
+   
+   -From 2010 to 2021, the shots attempted moved more towards the 3-point line.
+   
+   -Very few shots were taken past the half-court line, and these shots almost always resulted in a miss.
+   
+   -From 2020 to 2021 seemed to be the biggest change in location of shots taken.
+   
+Deeper Into the Report of Findings
+   -More shots being missed than made would make sense when you look into the percentage of shots made on average. When looking into the average shooting percentage in the NBA, typically only 40-50% of shots go in, and usually less than 50%. The trend found in the shot chart displays this well, as you can easily tell that there are overall more misses than makes. 
+   
+   -3-point shots are in general a much more difficult shot than those taken inside the paint, so it makes sense there are more misses here. Even with the Warriors having good 3-point shooters in Stephen Curry and Klay Thompson during these years, these baskets still tend to go in at a lower rate. This would make sense why it is worth more points then as it can be difficult for players to be able to make these while being defended. 
+   
+   -The shots moving towards the 3-point line can be a direct factor of Stephen Curry joining the team and the trend of the NBA moving to more 3-point shots. Stephen Curry is one of, if not the greatest 3-point shooter of all time. As he gained prowess in his career, the shots taken by the Warriors moved more and more towards perimeter shots. This makes sense since Curry takes many 3-point attempts, along with his fellow splash-brother Klay Thompson. The NBA has been moving away from in the paint shots as well and more towards 3-point     attempts, which is also shown through the trend of shot locations the since 2010.
+   
+   -Most shots taken past the half-court line tend to be for a buzzer-beater shot, which are near impossible to make. This explains why almost every shot taken past the half-court or at the half-court line resulted in a miss, and why very few of these shots were even attempted. One thing to note is that more of these shots were made after the 2010 season. This could be due to Stephen Curry becoming a better shooter so he was able to make a few of these shots. However, even a shooter with Curry's ability should not attempt these shots very often as they are unlikely to result in a make.
+   
+   -The location of shots being took may have changed the most between 2020 and 2021 due to the effect that covid-19 had on the entire NBA. Since this season occurred in what is referred to as "The Bubble", players were able to perform better due to lack of crowd and lack of distractions. This year also acted as an experimental year for most as well, so players were taking more 3-point attempts. It is also worth noting that a lot of the three-point attempts were missed in 2020, and this could be due to Stephen Curry missing the majority of that season.
 
-```
-3. (30 points) Write and document clean, efficient, reproducible code. Some notes:
-
-   - This code will be viewed by your direct supervisor.
-   - The code file should include your code to gather, join, and clean the data; the code to generate the graphic(s) presented; and your commentary on the results (so, a single .rmd file, or an .rmd file that sources an .r file).
-   - Your code should be clean, organized, and reproducible. Remove unnecessary/scratch/exploratory code.
-   - Your code should be well commented. In particular, any decisions or judgement calls made in the analysis process should be explained/justified. Sections of code should be identified even if not functionalized (including purpose, data/argument inputs, analysis outputs).
-
-```{R}
-
-```
 4. (10 points) Above and Beyond. Explore the data a bit, and create a graphic that uses (or incorporates) different information than what was used above. Some notes:
 
    - Create an additional graphic that incorporates at least one additional variable not previously used. The additional data should be drawn from a different dataset (function call) than the original graphic used. These two (or more) datasets may need to be joined appropriately.
@@ -98,8 +105,24 @@ library(ggplot2)
    - This graphic should be included at the end of the report (after the more detailed explanations). 
    - You should include a brief description of the graphic (highlighting the different/additional information used).
 
-  
-## The Deliverables
+```{R echo = FALSE, warning = FALSE}
+#The following code is to obtain annual season stats for the Golden State Warriors from the years 2000-2020
+stats <- teams_annual_stats(teams = "Golden State Warriors", all_active_teams = FALSE)%>%
+   filter(nameTeam =="Golden State Warriors",slugSeason >= 2000, slugSeason <= 2021)
+
+#The following is used to create a data frame containing only the statistics that I want to include in my graph
+warriors_data <- data_frame(shots = stats$fga, wins = stats$wins,year = stats$slugSeason)
+
+#The following plots and labels my graph
+ggplot(warriors_data, aes(x = shots, y = wins,color = factor(year))) +
+  geom_point() +
+   scale_color_discrete(name = "Season")+
+  labs(x = "Shots", y = "Wins", title = "Golden State Warriors Wins vs Shots Taken (2000-2021)")+
+   theme_dark()
+
+
+```
+This graph takes inspiration from Wayne Gretzky's famous quote, "You miss 100% of the shots you don't take." This graph shows that there seems to be a direct translation in the amount of shots taken compared to the amount of wins the Warriors have had since the 2000-2001 season. Most of the seasons that the Warriors had a good season in terms of wins was when they attempted a high amount of shots. Likewise, some of their worst season finishes less shots taken. This graph tells us that we should have a high number of attempted shots, granted they are good shots. 
 
 1. Upload your report and code file(s) to GitHub by 11:59am (noon) on Friday, March 31.
 2. Submit (on Canvas) your report, code, and link to your GitHub repository by 11:59am (noon) on Friday, March 31.
