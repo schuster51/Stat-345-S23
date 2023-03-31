@@ -114,10 +114,10 @@ stats <- teams_annual_stats(teams = "Golden State Warriors", all_active_teams = 
 warriors_data <- data_frame(shots = stats$fga, wins = stats$wins,year = stats$slugSeason)
 
 #The following plots and labels my graph
-ggplot(warriors_data, aes(x = shots, y = wins,color = factor(year))) +
+ggplot(warriors_data, aes(x = wins, y = shots,color = factor(year))) +
   geom_point() +
    scale_color_discrete(name = "Season")+
-  labs(x = "Shots", y = "Wins", title = "Golden State Warriors Wins vs Shots Taken (2000-2021)")+
+  labs(x = "Wins", y = "Shots", title = "Golden State Warriors Wins vs Shots Taken (2000-2021)")+
    theme_dark()
 
 
